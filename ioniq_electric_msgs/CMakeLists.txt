@@ -8,7 +8,7 @@ set(msg_files
 		"msg/EpsInfo.msg"
 	"msg/AccInfo.msg"
 	"msg/SpdInfo.msg"
-	"msg/EaitInfoImu.msg"
+	"msg/ImuInfo.msg"
 	"msg/RadInfo.msg"
 	"msg/AdditionalSig.msg"
 	"msg/CtrlA.msg"

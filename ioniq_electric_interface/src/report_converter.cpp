@@ -32,16 +32,16 @@ ReportConverter::ReportConverter() : rclcpp::Node("report_converter")
   eps_info_received_timestamp_ = this->now();
   acc_info_received_timestamp_ = this->now();
   spd_info_received_timestamp_ = this->now();
-  eait_info_imu_received_timestamp_ = this->now();
+  imu_info_received_timestamp_ = this->now();
   rad_info_received_timestamp_ = this->now();
-  additional_sig_received_timestamp_ = this->now();
+  // additional_sig_received_timestamp_ = this->now();
   
 
   // topic name 
   std::string eps_info_sub_topic_name = "/ioniq/eps_info";
   std::string acc_info_sub_topic_name = "/ioniq/acc_info";
   std::string spd_info_sub_topic_name = "/ioniq/spd_info";
-  std::string eait_info_imu_sub_topic_name = "/ioniq/eait_info_imu";
+  std::string imu_info_sub_topic_name = "/ioniq/imu_info";
   std::string rad_info_sub_topic_name = "/ioniq/rad_info";
   // std::string additional_sig_sub_topic_name = "/ioniq/additional_sig";
 
@@ -56,9 +56,9 @@ ReportConverter::ReportConverter() : rclcpp::Node("report_converter")
     spd_info_sub_topic_name, 1,
     std::bind(&ReportConverter::spdInfoCallback, this, std::placeholders::_1));
     
-  eait_info_imu_sub_ = create_subscription<ioniq_electric_msgs::msg::EaitInfoImu>(
-    eait_info_imu_sub_topic_name, 1,
-    std::bind(&ReportConverter::eaitInfoImuCallback, this, std::placeholders::_1));
+  imu_info_sub_ = create_subscription<ioniq_electric_msgs::msg::ImuInfo>(
+    imu_info_sub_topic_name, 1,
+    std::bind(&ReportConverter::imuInfoCallback, this, std::placeholders::_1));
 
   rad_info_sub_ = create_subscription<ioniq_electric_msgs::msg::RadInfo>(
     rad_info_sub_topic_name, 1,
@@ -108,22 +108,23 @@ void ReportConverter::timerCallback()
   //   (current_time - eps_info_received_timestamp_).seconds() * 1000.0;
   // const double rad_info_delta_time_ms =
   //   (current_time - rad_info_received_timestamp_).seconds() * 1000.0;
-  // const double eait_info_imu_delta_time_ms = 
-  //   (current_time - eait_info_imu_received_timestamp_).seconds() * 1000.0;
+  // const double imu_info_delta_time_ms = 
+  //   (current_time - imu_info_received_timestamp_).seconds() * 1000.0;
   // const double additional_sig_delta_time_ms =
   //   (current_time - additional_sig_received_timestamp_).seconds() * 1000.0;
 
   if (eps_info_ptr_ == nullptr || acc_info_ptr_ == nullptr
       // spd_info_delta_time_ms>param_.report_msg_timeout_ms || acc_info_delta_time_ms>param_.report_msg_timeout_ms || 
       // eps_info_delta_time_ms>param_.report_msg_timeout_ms || rad_info_delta_time_ms>param_.report_msg_timeout_ms ||
-      // eait_info_imu_delta_time_ms>param_.report_msg_timeout_ms
+      // imu_info_delta_time_ms>param_.report_msg_timeout_ms
       )
   {
     // RCLCPP_ERROR_THROTTLE(
     //   get_logger(), *this->get_clock(), std::chrono::milliseconds(5000).count(), "vital msgs not received or timeout");
     return;
   }
-  // making gear msg
+
+  // 1. making gear msg
   gear_msg_.stamp = current_time;
   switch (acc_info_ptr_->g_sel_disp) {
     case static_cast<int8_t>(GEAR_DRIVE):
@@ -144,21 +145,21 @@ void ReportConverter::timerCallback()
   }
   gear_status_pub_->publish(gear_msg_);
 
-  // making velocity
+  // 2. making velocity
   velocity_report_msg_.header.frame_id = param_.base_frame_id;
   velocity_report_msg_.header.stamp = current_time;
   velocity_report_msg_.longitudinal_velocity = acc_info_ptr_->vs / 3.6;
   vehicle_twist_pub_->publish(velocity_report_msg_);
 
-  // make steering angle
+  // 3. make steering angle
   steer_report_msg_.stamp = current_time;
   steer_report_msg_.steering_tire_angle = eps_info_ptr_->str_ang * param_.steering_factor;
   steering_status_pub_->publish(steer_report_msg_);
 
-  // make control mode
+  // 4. make control mode
   control_mode_report_msg_.stamp = current_time;
   control_mode_report_msg_.mode = 1;
-  // switch (rad_info_ptr_->vehicle_mode_state)
+  // switch (->vehicle_mode_state)
   // {
   // case static_cast<int8_t>(VEHICLE_Manual_Remote_Mode):
   //   control_mode_report_msg_.mode = autoware_vehicle_msgs::msg::ControlModeReport::MANUAL;
@@ -178,7 +179,7 @@ void ReportConverter::timerCallback()
   // }
   control_mode_pub_->publish(control_mode_report_msg_);
 
-  // hazard lights status
+  // 5. hazard lights status
   hazard_lights_report_msg_.stamp = current_time;
   if(acc_info_ptr_->hazard_en == 1)
   {
@@ -187,7 +188,7 @@ void ReportConverter::timerCallback()
     hazard_lights_report_msg_.report = autoware_vehicle_msgs::msg::HazardLightsReport::DISABLE;
   }
 
-  // turn indicators, ioniq feedbacks LEFT light and RIGHT light separately, if the hazard light blink, it will output ENABLE_LEFT as default
+  // 6. turn indicators
   turn_indicators_report_msg_.stamp = current_time;
   if (acc_info_ptr_->turn_left_en == 1) {
     turn_indicators_report_msg_.report =
@@ -201,7 +202,7 @@ void ReportConverter::timerCallback()
   }
   turn_indicators_status_pub_->publish(turn_indicators_report_msg_);
 
-  // tier4 vehicle msgs, acutation msgs
+  // 7. acutation status
   actuation_status_stamped_msg_.header.stamp = current_time;
   actuation_status_stamped_msg_.header.frame_id = "base_link";
   double acc = acc_info_ptr_->long_accel;
@@ -213,11 +214,9 @@ void ReportConverter::timerCallback()
     actuation_status_stamped_msg_.status.brake_status = -acc;
   }
   actuation_status_stamped_msg_.status.steer_status = eps_info_ptr_->str_ang * param_.steering_factor;
+  actuation_status_pub_->publish(actuation_status_stamped_msg_);
 
   //additional_sig_ptr_->accelerator_pedal_position / 100.0
-
-  // have no idea about the mean of steer_status in ActuationStatusStamped, so it should be empty
-  actuation_status_pub_->publish(actuation_status_stamped_msg_);
   // to be done, tier4 msgs
 }
 
@@ -240,10 +239,10 @@ void ReportConverter::spdInfoCallback(const ioniq_electric_msgs::msg::SpdInfo::C
   spd_info_ptr_ = msg;
 }
 
-void ReportConverter::eaitInfoImuCallback(const ioniq_electric_msgs::msg::EaitInfoImu::ConstSharedPtr &msg)
+void ReportConverter::imuInfoCallback(const ioniq_electric_msgs::msg::ImuInfo::ConstSharedPtr &msg)
 {
-  eait_info_imu_received_timestamp_ = this->now();
-  eait_info_imu_ptr_ = msg;
+  imu_info_received_timestamp_ = this->now();
+  imu_info_ptr_ = msg;
 }
 
 void ReportConverter::radInfoCallback(const ioniq_electric_msgs::msg::RadInfo::ConstSharedPtr &msg)

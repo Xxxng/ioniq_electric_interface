@@ -33,7 +33,7 @@
 #include <ioniq_electric_msgs/msg/acc_info.hpp>
 #include <ioniq_electric_msgs/msg/eps_info.hpp>
 #include <ioniq_electric_msgs/msg/spd_info.hpp>
-#include <ioniq_electric_msgs/msg/eait_info_imu.hpp>
+#include <ioniq_electric_msgs/msg/imu_info.hpp>
 #include <ioniq_electric_msgs/msg/rad_info.hpp>
 #include <ioniq_electric_msgs/msg/additional_sig.hpp>
 
@@ -98,7 +98,7 @@ private:
   rclcpp::Subscription<ioniq_electric_msgs::msg::EpsInfo>::SharedPtr eps_info_sub_;
   rclcpp::Subscription<ioniq_electric_msgs::msg::AccInfo>::SharedPtr acc_info_sub_;
   rclcpp::Subscription<ioniq_electric_msgs::msg::SpdInfo>::SharedPtr spd_info_sub_;
-  rclcpp::Subscription<ioniq_electric_msgs::msg::EaitInfoImu>::SharedPtr eait_info_imu_sub_;
+  rclcpp::Subscription<ioniq_electric_msgs::msg::ImuInfo>::SharedPtr imu_info_sub_;
   rclcpp::Subscription<ioniq_electric_msgs::msg::RadInfo>::SharedPtr rad_info_sub_;
   rclcpp::Subscription<ioniq_electric_msgs::msg::AdditionalSig>::SharedPtr additional_sig_sub_;
 
@@ -109,7 +109,7 @@ private:
   ioniq_electric_msgs::msg::EpsInfo::ConstSharedPtr eps_info_ptr_;
   ioniq_electric_msgs::msg::AccInfo::ConstSharedPtr acc_info_ptr_;
   ioniq_electric_msgs::msg::SpdInfo::ConstSharedPtr spd_info_ptr_;
-  ioniq_electric_msgs::msg::EaitInfoImu::ConstSharedPtr eait_info_imu_ptr_;
+  ioniq_electric_msgs::msg::ImuInfo::ConstSharedPtr imu_info_ptr_;
   ioniq_electric_msgs::msg::RadInfo::ConstSharedPtr rad_info_ptr_;
   ioniq_electric_msgs::msg::AdditionalSig::ConstSharedPtr additional_sig_ptr_;
 
@@ -117,7 +117,7 @@ private:
   rclcpp::Time eps_info_received_timestamp_;
   rclcpp::Time acc_info_received_timestamp_;
   rclcpp::Time spd_info_received_timestamp_;
-  rclcpp::Time eait_info_imu_received_timestamp_;
+  rclcpp::Time imu_info_received_timestamp_;
   rclcpp::Time rad_info_received_timestamp_;
   rclcpp::Time additional_sig_received_timestamp_;
 
@@ -139,7 +139,7 @@ public:
   void epsInfoCallback(const ioniq_electric_msgs::msg::EpsInfo::ConstSharedPtr &msg);
   void accInfoCallback(const ioniq_electric_msgs::msg::AccInfo::ConstSharedPtr &msg);
   void spdInfoCallback(const ioniq_electric_msgs::msg::SpdInfo::ConstSharedPtr &msg);
-  void eaitInfoImuCallback(const ioniq_electric_msgs::msg::EaitInfoImu::ConstSharedPtr &msg);
+  void imuInfoCallback(const ioniq_electric_msgs::msg::ImuInfo::ConstSharedPtr &msg);
   void radInfoCallback(const ioniq_electric_msgs::msg::RadInfo::ConstSharedPtr &msg);
   void additionalSigCallback(const ioniq_electric_msgs::msg::AdditionalSig::ConstSharedPtr &msg);
 };

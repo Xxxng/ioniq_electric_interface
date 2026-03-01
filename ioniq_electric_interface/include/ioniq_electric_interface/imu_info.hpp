@@ -3,10 +3,10 @@
 #include <ioniq_electric_interface/Byte.hpp>
 #include <iostream>
 
-class EaitInfoImu {
+class ImuInfo {
 public:
     static const uint32_t ID = 0x713;
-    EaitInfoImu();
+    ImuInfo();
     void Parse();
     void update_bytes(uint8_t bytes_data[8]);
     // singal

@@ -14,14 +14,14 @@
 #include <ioniq_electric_msgs/msg/eps_info.hpp>
 #include <ioniq_electric_msgs/msg/acc_info.hpp>
 #include <ioniq_electric_msgs/msg/spd_info.hpp>
-#include <ioniq_electric_msgs/msg/eait_info_imu.hpp>
+#include <ioniq_electric_msgs/msg/imu_info.hpp>
 #include <ioniq_electric_msgs/msg/rad_info.hpp>
 #include <ioniq_electric_msgs/msg/additional_sig.hpp>
 
 #include <ioniq_electric_interface/eps_info.hpp>
 #include <ioniq_electric_interface/acc_info.hpp>
 #include <ioniq_electric_interface/spd_info.hpp>
-#include <ioniq_electric_interface/eait_info_imu.hpp>
+#include <ioniq_electric_interface/imu_info.hpp>
 #include <ioniq_electric_interface/rad_info.hpp>
 #include <ioniq_electric_interface/additional_sig.hpp>
 
@@ -61,7 +61,7 @@ private:
   rclcpp::Publisher<ioniq_electric_msgs::msg::EpsInfo>::SharedPtr eps_info_pub_;
   rclcpp::Publisher<ioniq_electric_msgs::msg::AccInfo>::SharedPtr acc_info_pub_;
   rclcpp::Publisher<ioniq_electric_msgs::msg::SpdInfo>::SharedPtr spd_info_pub_;
-  rclcpp::Publisher<ioniq_electric_msgs::msg::EaitInfoImu>::SharedPtr eait_info_imu_pub_;
+  rclcpp::Publisher<ioniq_electric_msgs::msg::ImuInfo>::SharedPtr imu_info_pub_;
   rclcpp::Publisher<ioniq_electric_msgs::msg::RadInfo>::SharedPtr rad_info_pub_;
   rclcpp::Publisher<ioniq_electric_msgs::msg::AdditionalSig>::SharedPtr additional_sig_pub_;
 
@@ -70,7 +70,7 @@ private:
   ioniq_electric_msgs::msg::EpsInfo::ConstSharedPtr eps_info_ptr_;
   ioniq_electric_msgs::msg::AccInfo::ConstSharedPtr acc_info_ptr_;
   ioniq_electric_msgs::msg::SpdInfo::ConstSharedPtr spd_info_ptr_;
-  ioniq_electric_msgs::msg::EaitInfoImu::ConstSharedPtr eait_info_imu_ptr_;
+  ioniq_electric_msgs::msg::ImuInfo::ConstSharedPtr imu_info_ptr_;
   ioniq_electric_msgs::msg::RadInfo::ConstSharedPtr rad_info_ptr_;
   ioniq_electric_msgs::msg::AdditionalSig::ConstSharedPtr additional_sig_ptr_;
 
@@ -79,7 +79,7 @@ private:
   EpsInfo eps_info_entity_;
   AccInfo acc_info_entity_;
   SpdInfo spd_info_entity_;
-  EaitInfoImu eait_info_imu_entity_;
+  ImuInfo imu_info_entity_;
   RadInfo rad_info_entity_;
   AdditionalSig additional_sig_entity_;
 
@@ -88,7 +88,7 @@ private:
   rclcpp::Time eps_info_received_time_;
   rclcpp::Time acc_info_received_time_;
   rclcpp::Time spd_info_received_time_;
-  rclcpp::Time eait_info_imu_received_time_;
+  rclcpp::Time imu_info_received_time_;
   rclcpp::Time rad_info_received_time_;
   rclcpp::Time additional_sig_received_time_;
 

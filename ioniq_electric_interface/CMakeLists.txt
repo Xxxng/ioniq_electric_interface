@@ -26,7 +26,7 @@ ament_auto_add_executable(${PROJECT_NAME}_report_parser_node
   src/eps_info.cc
   src/acc_info.cc
   src/spd_info.cc
-  src/eait_info_imu.cc
+  src/imu_info.cc
   src/rad_info.cc
   src/additional_sig.cc
 

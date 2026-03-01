@@ -44,6 +44,10 @@ ControlConverter::ControlConverter() : Node("control_converter")
       &ControlConverter::onControlModeRequest, this, std::placeholders::_1, std::placeholders::_2));
 
   // subscribers
+  acc_info_sub_ = create_subscription<AccInfo>(
+    "/ioniq/acc_info", 1,
+    std::bind(&ControlConverter::callbackAccInfo, this, std::placeholders::_1));
+  
   control_cmd_sub_ = create_subscription<autoware_control_msgs::msg::Control>(
     "/control/command/control_cmd", 1,
     std::bind(&ControlConverter::callbackControlCmd, this, std::placeholders::_1));
@@ -54,9 +58,6 @@ ControlConverter::ControlConverter() : Node("control_converter")
   gear_command_sub_ = create_subscription<autoware_vehicle_msgs::msg::GearCommand>(
     "/control/command/gear_cmd", 1,
     std::bind(&ControlConverter::callbackGearCommand, this, std::placeholders::_1));
-  acc_info_sub_ = create_subscription<AccInfo>(
-    "/ioniq/acc_info", 1,
-    std::bind(&ControlConverter::callbackAccInfo, this, std::placeholders::_1));
   hazard_lights_cmd_sub_ = create_subscription<	autoware_vehicle_msgs::msg::HazardLightsCommand>(
     "/control/command/hazard_lights_cmd", 1,
     std::bind(&ControlConverter::callbackHarzardLightsCmd, this, std::placeholders::_1));
@@ -66,6 +67,7 @@ ControlConverter::ControlConverter() : Node("control_converter")
   vehicle_cmd_emergency_sub_ = create_subscription<tier4_vehicle_msgs::msg::VehicleEmergencyStamped>(
     "/control/command/vehicle_cmd_emergency", 1,
     std::bind(&ControlConverter::callbackVehicleCmdEmergency, this, std::placeholders::_1));
+    
   operation_mode_sub_ = create_subscription<autoware_adapi_v1_msgs::msg::OperationModeState>(
     "/api/operation_mode/state", 1,
     std::bind(&ControlConverter::callbackOperationMode, this, std::placeholders::_1));

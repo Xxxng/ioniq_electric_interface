@@ -18,7 +18,7 @@ ReportParser::ReportParser() : Node("report_parser")
   eps_info_received_time_ = this->now();
   acc_info_received_time_ = this->now();
   spd_info_received_time_ = this->now();
-  eait_info_imu_received_time_ = this->now();
+  imu_info_received_time_ = this->now();
   rad_info_received_time_ = this->now();
   additional_sig_received_time_ = this->now();
 
@@ -39,7 +39,7 @@ ReportParser::ReportParser() : Node("report_parser")
     eps_info_pub_ = create_publisher<ioniq_electric_msgs::msg::EpsInfo>("/ioniq/eps_info", rclcpp::QoS{1});
     acc_info_pub_ = create_publisher<ioniq_electric_msgs::msg::AccInfo>("/ioniq/acc_info", rclcpp::QoS{1});
     spd_info_pub_ = create_publisher<ioniq_electric_msgs::msg::SpdInfo>("/ioniq/spd_info", rclcpp::QoS{1});
-    eait_info_imu_pub_ = create_publisher<ioniq_electric_msgs::msg::EaitInfoImu>("/ioniq/eait_info_imu", rclcpp::QoS{1});
+    imu_info_pub_ = create_publisher<ioniq_electric_msgs::msg::ImuInfo>("/ioniq/imu_info", rclcpp::QoS{1});
     rad_info_pub_ = create_publisher<ioniq_electric_msgs::msg::RadInfo>("/ioniq/rad_info", rclcpp::QoS{1});
     additional_sig_pub_ = create_publisher<ioniq_electric_msgs::msg::AdditionalSig>("/ioniq/additional_sig", rclcpp::QoS{1});
   }
@@ -67,7 +67,7 @@ void ReportParser::callbackCan(const can_msgs::msg::Frame::ConstSharedPtr & msg)
   ioniq_electric_msgs::msg::EpsInfo eps_info_msg;
   ioniq_electric_msgs::msg::AccInfo acc_info_msg;
   ioniq_electric_msgs::msg::SpdInfo spd_info_msg;
-  ioniq_electric_msgs::msg::EaitInfoImu eait_info_imu_msg;
+  ioniq_electric_msgs::msg::ImuInfo imu_info_msg;
   ioniq_electric_msgs::msg::RadInfo rad_info_msg;
   ioniq_electric_msgs::msg::AdditionalSig additional_sig_msg;
 
@@ -152,22 +152,22 @@ void ReportParser::callbackCan(const can_msgs::msg::Frame::ConstSharedPtr & msg)
     break;
     
 
-    case EaitInfoImu::ID:
-      eait_info_imu_received_time_ = this->now();
+    case ImuInfo::ID:
+      imu_info_received_time_ = this->now();
       
       for(uint i=0;i<8;i++)
       {
       byte_temp[i] = msg->data[i];
       }
-      eait_info_imu_entity_.update_bytes(byte_temp);
-      eait_info_imu_entity_.Parse();
+      imu_info_entity_.update_bytes(byte_temp);
+      imu_info_entity_.Parse();
 
-      eait_info_imu_msg.header = header;
-      eait_info_imu_msg.lat_accel = eait_info_imu_entity_.lat_accel_;
-      eait_info_imu_msg.yaw_rate = eait_info_imu_entity_.yaw_rate_;
-      eait_info_imu_msg.brk_cylinder = eait_info_imu_entity_.brk_cylinder_;
+      imu_info_msg.header = header;
+      imu_info_msg.lat_accel = imu_info_entity_.lat_accel_;
+      imu_info_msg.yaw_rate = imu_info_entity_.yaw_rate_;
+      imu_info_msg.brk_cylinder = imu_info_entity_.brk_cylinder_;
 
-      eait_info_imu_ptr_ = std::make_shared<ioniq_electric_msgs::msg::EaitInfoImu>(eait_info_imu_msg);
+      imu_info_ptr_ = std::make_shared<ioniq_electric_msgs::msg::ImuInfo>(imu_info_msg);
     break;
     
 
@@ -224,7 +224,7 @@ void ReportParser::timerCallback()
     checkAndPublishMessage(eps_info_received_time_, eps_info_ptr_, eps_info_pub_, "eps_info");
     checkAndPublishMessage(acc_info_received_time_, acc_info_ptr_, acc_info_pub_, "acc_info");
     checkAndPublishMessage(spd_info_received_time_, spd_info_ptr_, spd_info_pub_, "spd_info");
-    checkAndPublishMessage(eait_info_imu_received_time_, eait_info_imu_ptr_, eait_info_imu_pub_, "eait_info_imu");
+    checkAndPublishMessage(imu_info_received_time_, imu_info_ptr_, imu_info_pub_, "imu_info");
     checkAndPublishMessage(rad_info_received_time_, rad_info_ptr_, rad_info_pub_, "rad_info");
     checkAndPublishMessage(additional_sig_received_time_, additional_sig_ptr_, additional_sig_pub_, "additional_sig");
 }
